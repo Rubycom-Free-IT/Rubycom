@@ -16,4 +16,4 @@ Feature: Get data from source by type
   Scenario: Try get data by invalid key or source is unavailable
     Given an invalid data type key
     When I try get data by for invalid type key
-    Then I should get nil
+    Then I should get nil data clazz

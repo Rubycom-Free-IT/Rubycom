@@ -1,40 +1,32 @@
-Given('the data types list [json, csv, web]') do
-  SOURCE_TYPES = %w[web json csv].freeze
+Given('an instance of Converter with valid source data hash') do
+  @data_hash = {
+    "USD" => {
+      "Cur_Scale" => 1,
+      "Cur_Name" => "Доллар США",
+      "Cur_OfficialRate" => 2.3898
+    },
+    "EUR" => {
+      "Cur_Scale" => 1,
+      "Cur_Name" => "Евро",
+      "Cur_OfficialRate" => 2.7711
+    }
+  }
+  @converter = Converter.new(@data_hash)
 end
 
-Given('a stubbed class methods get_data') do
-  @expected_data = {"BYN" => 1}
-  SOURCE_TYPES.each do |i|
-    clazz = DataFactory.for(i)
-    allow(clazz)
-      .to receive(:get_data).with('')
-      .and_return(@expected_data)
-  end
+When('I call convert method with {int} {string} to {string}') do |amount, from, to|
+  @result = @converter.convert(amount, from, to)
 end
 
-Given('an invalid data type key') do
-  @invalid_type = 'invalid'
+When('I try to convert {string} currency') do |currency|
+  @result = @converter.convert(1, currency, currency)
 end
 
-When('I try get data by type keys') do
-  @result_data = []
-  SOURCE_TYPES.each do |i|
-    @result_data << DataFactory.for(i).get_data('')
-  end
+Then('I should get {int} {string} equals {int} {string}') do |amount, from, value, to|
+  expect(@result).
+    to contain_exactly(Money.new(amount, from), Money.new(value, to))
 end
 
-When('I try get data by for invalid type key') do
-  @data_clazz = DataFactory.for(@invalid_type)
-end
-
-Then('I should have calls count equals data types count') do
-  expect(@result_data.size).to eq(SOURCE_TYPES.size)
-end
-
-Then('I should get all the same expected responses') do
-  expect(@result_data).to all eq(@expected_data)
-end
-
-Then('I should get nil') do
-  expect(@data_clazz).to eq(nil)
+Then('convert return nil') do
+  expect(@result).to eq(nil)
 end
