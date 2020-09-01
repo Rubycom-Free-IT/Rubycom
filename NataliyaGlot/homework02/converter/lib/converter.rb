@@ -65,5 +65,3 @@ class Converter
   end
 end
 
-converter = Converter.new('10', 'EUR')
-puts converter.to_rus 
